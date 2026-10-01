@@ -75,8 +75,7 @@ async-io = "2.6"
 [target.'cfg(target_os = "android")'.dependencies]
 bevy_android = { path = "../bevy_android", version = "0.19.1", default-features = false }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-# TODO: Assuming all wasm builds are for the browser. Require `no_std` support to break assumption.
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 wasm-bindgen = { version = "0.2" }
 web-sys = { version = "0.3", features = [
   "Window",

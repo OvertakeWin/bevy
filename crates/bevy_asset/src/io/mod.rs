@@ -8,11 +8,11 @@ compile_error!(
 #[cfg(target_os = "android")]
 pub mod android;
 pub mod embedded;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(target_arch = "wasm32"), target_os = "wasi"))]
 pub mod file;
 pub mod memory;
 pub mod processor_gated;
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
 pub mod wasm;
 #[cfg(any(feature = "http", feature = "https"))]
 pub mod web;
@@ -775,11 +775,17 @@ pub(crate) fn get_meta_path(path: &Path) -> PathBuf {
     meta_path
 }
 
-#[cfg(any(target_arch = "wasm32", target_os = "android"))]
+#[cfg(any(
+    all(target_arch = "wasm32", not(target_os = "wasi")),
+    target_os = "android"
+))]
 /// A [`PathBuf`] [`Stream`] implementation that immediately returns nothing.
 struct EmptyPathStream;
 
-#[cfg(any(target_arch = "wasm32", target_os = "android"))]
+#[cfg(any(
+    all(target_arch = "wasm32", not(target_os = "wasi")),
+    target_os = "android"
+))]
 impl Stream for EmptyPathStream {
     type Item = PathBuf;
 

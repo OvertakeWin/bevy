@@ -37,9 +37,8 @@ tracy-client = { version = "0.18.3", optional = true }
 [target.'cfg(target_os = "android")'.dependencies]
 android_log-sys = "0.3.0"
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 tracing-wasm = "0.2.1"
-# TODO: Assuming all wasm builds are for the browser. Require `no_std` support to break assumption.
 bevy_app = { path = "../bevy_app", version = "0.19.1", default-features = false, features = [
   "web",
 ] }
