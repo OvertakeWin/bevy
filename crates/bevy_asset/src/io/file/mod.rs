@@ -16,6 +16,7 @@ pub(crate) mod sync_file_asset;
 pub use file_watcher::*;
 use tracing::{debug, error};
 
+#[cfg(not(target_os = "wasi"))]
 use alloc::borrow::ToOwned;
 use std::{
     env,
@@ -28,6 +29,10 @@ pub(crate) fn get_base_path() -> PathBuf {
     } else if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         PathBuf::from(manifest_dir)
     } else {
+        // WASI exposes a preopened filesystem namespace, not an executable path.
+        #[cfg(target_os = "wasi")]
+        return PathBuf::from(".");
+        #[cfg(not(target_os = "wasi"))]
         env::current_exe()
             .map(|path| path.parent().map(ToOwned::to_owned).unwrap())
             .unwrap()

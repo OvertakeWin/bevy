@@ -476,9 +476,12 @@ impl AssetSource {
         _path: String,
     ) -> impl FnMut() -> Box<dyn ErasedAssetReader> + Send + Sync {
         move || {
-            #[cfg(all(not(target_arch = "wasm32"), not(target_os = "android")))]
+            #[cfg(all(
+                any(not(target_arch = "wasm32"), target_os = "wasi"),
+                not(target_os = "android")
+            ))]
             return Box::new(super::file::FileAssetReader::new(&_path));
-            #[cfg(target_arch = "wasm32")]
+            #[cfg(all(target_arch = "wasm32", not(target_os = "wasi")))]
             return Box::new(super::wasm::HttpWasmAssetReader::new(&_path));
             #[cfg(target_os = "android")]
             return Box::new(super::android::AndroidAssetReader);
@@ -491,12 +494,18 @@ impl AssetSource {
         _path: String,
     ) -> impl FnMut(bool) -> Option<Box<dyn ErasedAssetWriter>> + Send + Sync {
         move |_create_root: bool| {
-            #[cfg(all(not(target_arch = "wasm32"), not(target_os = "android")))]
+            #[cfg(all(
+                any(not(target_arch = "wasm32"), target_os = "wasi"),
+                not(target_os = "android")
+            ))]
             return Some(Box::new(super::file::FileAssetWriter::new(
                 &_path,
                 _create_root,
             )));
-            #[cfg(any(target_arch = "wasm32", target_os = "android"))]
+            #[cfg(any(
+                all(target_arch = "wasm32", not(target_os = "wasi")),
+                target_os = "android"
+            ))]
             return None;
         }
     }

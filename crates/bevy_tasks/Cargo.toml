@@ -52,7 +52,7 @@ crossbeam-queue = { version = "0.3", default-features = false, features = [
   "alloc",
 ] }
 
-[target.'cfg(target_arch = "wasm32")'.dependencies]
+[target.'cfg(all(target_arch = "wasm32", not(target_os = "wasi")))'.dependencies]
 web-task = "1"
 
 [target.'cfg(not(all(target_has_atomic = "8", target_has_atomic = "16", target_has_atomic = "32", target_has_atomic = "64", target_has_atomic = "ptr")))'.dependencies]
